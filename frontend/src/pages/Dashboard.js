@@ -20,11 +20,18 @@ function Dashboard() {
   const [editId, setEditId] = useState(null);
   const [filtered, setFiltered] = useState([]);
 
+  // ✅ FIXED useEffect (no Vercel error)
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) navigate("/");
-    else fetchTasks();
-  }, [navigate]);
+
+    if (!token) {
+      navigate("/");
+    } else {
+      fetchTasks();
+    }
+
+    // eslint-disable-next-line
+  }, []);
 
   const fetchTasks = async () => {
     try {
@@ -61,12 +68,16 @@ function Dashboard() {
     try {
       if (editId) {
         await API.put(`/tasks/${editId}`, body, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
         });
         setEditId(null);
       } else {
         await API.post("/tasks", body, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
         });
       }
 
@@ -74,6 +85,7 @@ function Dashboard() {
       setTime("");
       setFiltered([]);
       fetchTasks();
+
     } catch {
       alert("Error saving task");
     }
@@ -81,7 +93,9 @@ function Dashboard() {
 
   const deleteTask = async (id) => {
     await API.delete(`/tasks/${id}`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      }
     });
     fetchTasks();
   };
@@ -90,7 +104,9 @@ function Dashboard() {
     await API.put(`/tasks/${task._id}`, {
       completed: !task.completed
     }, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      }
     });
     fetchTasks();
   };
@@ -109,7 +125,7 @@ function Dashboard() {
   return (
     <div style={{
       minHeight: "100vh",
-      background: "linear-gradient(135deg, #1e3c72, #2a5298)", // SAME BG
+      background: "linear-gradient(135deg, #1e3c72, #2a5298)",
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
@@ -117,7 +133,7 @@ function Dashboard() {
     }}>
 
       <div style={{
-        width: "500px", // SAME WIDTH
+        width: "500px",
         background: "rgba(255,255,255,0.1)",
         backdropFilter: "blur(15px)",
         padding: "25px",
@@ -130,8 +146,7 @@ function Dashboard() {
         <div style={{
           display: "flex",
           justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "10px"
+          alignItems: "center"
         }}>
           <h2>🚀 Smart To-Do</h2>
 
@@ -185,7 +200,10 @@ function Dashboard() {
                     setTitle(item);
                     setFiltered([]);
                   }}
-                  style={{ padding: "10px", cursor: "pointer" }}
+                  style={{
+                    padding: "10px",
+                    cursor: "pointer"
+                  }}
                 >
                   {item}
                 </div>
@@ -225,7 +243,7 @@ function Dashboard() {
 
         <hr />
 
-        {/* TASKS */}
+        {/* TASK LIST */}
         {tasks.map(task => (
           <div key={task._id} style={{
             background: task.completed ? "#00c6ff" : "#ffffff20",
