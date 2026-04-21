@@ -26,8 +26,8 @@ app.get("/", (req, res) => {
 });
 
 // routes (uncomment when needed)
-// app.use("/api/auth", require("./routes/authRoutes"));
-// app.use("/api/tasks", require("./routes/taskRoutes"));
+ app.use("/api/auth", require("./routes/authRoutes"));
+ app.use("/api/tasks", require("./routes/taskRoutes"));
 
 // start server
 const PORT = process.env.PORT || 5000;
