@@ -9,6 +9,11 @@ router.post("/signup", async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    // 🔍 validation
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password required" });
+    }
+
     let user = await User.findOne({ email });
     if (user) {
       return res.status(400).json({ message: "User already exists" });
@@ -26,7 +31,8 @@ router.post("/signup", async (req, res) => {
     res.json({ message: "Signup successful" });
 
   } catch (err) {
-    res.status(500).json({ message: "Server error" });
+    console.log("SIGNUP ERROR:", err); // ✅ show real error
+    res.status(500).json({ message: err.message });
   }
 });
 
@@ -34,6 +40,11 @@ router.post("/signup", async (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    // 🔍 validation
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password required" });
+    }
 
     const user = await User.findOne({ email });
     if (!user) {
@@ -47,14 +58,15 @@ router.post("/login", async (req, res) => {
 
     const token = jwt.sign(
       { id: user._id },
-      "secretkey",
+      process.env.JWT_SECRET, // ✅ use env instead of hardcoded
       { expiresIn: "1h" }
     );
 
     res.json({ token });
 
   } catch (err) {
-    res.status(500).json({ message: "Server error" });
+    console.log("LOGIN ERROR:", err); // ✅ show real error
+    res.status(500).json({ message: err.message });
   }
 });
 
