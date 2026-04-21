@@ -14,9 +14,15 @@ function Login() {
         password
       });
 
+      // ✅ Save token
       localStorage.setItem("token", res.data.token);
 
+      // ✅ Optional debug
+      console.log("Token saved:", res.data.token);
+
       alert("Login successful");
+
+      // ✅ Navigate immediately (no delay needed)
       navigate("/dashboard");
 
     } catch (err) {
