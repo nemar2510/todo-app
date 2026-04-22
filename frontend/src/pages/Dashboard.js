@@ -313,11 +313,29 @@ function Dashboard() {
               <small>{task.time}</small>
             </div>
 
-            <div>
-              <button onClick={() => startEdit(task)}><FaEdit /></button>
-              <button onClick={() => toggleComplete(task)}><FaCheck /></button>
-              <button onClick={() => deleteTask(task._id)}><FaTrash /></button>
-            </div>
+           <div style={{ display: "flex", gap: "5px", flexWrap: "wrap" }}>
+  <button onClick={() => startEdit(task)}><FaEdit /></button>
+  <button onClick={() => toggleComplete(task)}><FaCheck /></button>
+  <button onClick={() => deleteTask(task._id)}><FaTrash /></button>
+
+  <button
+    onClick={() => {
+      Notification.requestPermission().then((permission) => {
+        console.log("Permission:", permission);
+      });
+    }}
+    style={{
+      fontSize: "10px",
+      padding: "4px",
+      background: "#00c6ff",
+      border: "none",
+      borderRadius: "4px",
+      color: "white"
+    }}
+  >
+    Enable Notifications
+  </button>
+</div>
           </div>
         ))}
 
