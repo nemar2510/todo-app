@@ -1,6 +1,10 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const cron = require("node-cron");
+
+// 🔥 Firebase Admin
+const admin = require("./firebaseAdmin");
 
 // load environment variables
 require("dotenv").config({ path: "./.env" });
@@ -17,17 +21,74 @@ mongoose
   .then(() => console.log("✅ MongoDB Connected"))
   .catch((err) => {
     console.log("❌ Mongo Error:", err.message);
-    process.exit(1); // stop app if DB fails
+    process.exit(1);
   });
+
+  // 🔥 AUTO REMINDER CHECK
+cron.schedule("* * * * *", async () => {
+  console.log("Checking tasks...");
+
+  try {
+    const Task = require("./models/Task");
+
+    const now = new Date();
+    const currentTime =
+      now.getHours().toString().padStart(2, "0") +
+      ":" +
+      now.getMinutes().toString().padStart(2, "0");
+
+    // 🔍 Find tasks matching current time
+    const tasks = await Task.find({ time: currentTime });
+
+    for (let task of tasks) {
+      // 👉 you will later store user device token in DB
+      const token = "dzEKp1rbB0LVTbZF903x8P:APA91bFuw47U4ZEw-v8LTVOuY6V0IqVn5yUEI8_1jhHlyHKBfJCb38ZX2zI7-p1t_JodutcwyNRwltU_egZiou_1QV0piRkEgwFqkc327D4Wv2WOkYxutao";
+
+      await admin.messaging().send({
+        token,
+        notification: {
+          title: "⏰ Task Reminder",
+          body: task.title
+        }
+      });
+
+      console.log("Notification sent for:", task.title);
+    }
+
+  } catch (err) {
+    console.log("Cron error:", err.message);
+  }
+});
 
 // test route
 app.get("/", (req, res) => {
   res.send("Server is working");
 });
 
-// routes (uncomment when needed)
- app.use("/api/auth", require("./routes/authRoutes"));
- app.use("/api/tasks", require("./routes/taskRoutes"));
+// 🔥 Notification test route
+app.get("/test-notification", async (req, res) => {
+  try {
+    const token = "dzEKp1rbB0LVTbZF903x8P:APA91bFuw47U4ZEw-v8LTVOuY6V0IqVn5yUEI8_1jhHlyHKBfJCb38ZX2zI7-p1t_JodutcwyNRwltU_egZiou_1QV0piRkEgwFqkc327D4Wv2WOkYxutao";
+
+    await admin.messaging().send({
+      token,
+      notification: {
+        title: "🔥 Notification Working!",
+        body: "Your app can now send reminders 🎉"
+      }
+    });
+
+    res.send("Notification sent");
+
+  } catch (err) {
+    console.log("Notification error:", err.message);
+    res.send("Error sending notification");
+  }
+});
+
+// routes (UNCHANGED)
+app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/tasks", require("./routes/taskRoutes"));
 
 // start server
 const PORT = process.env.PORT || 5000;
