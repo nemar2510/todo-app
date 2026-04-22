@@ -43,7 +43,7 @@ cron.schedule("* * * * *", async () => {
 
     for (let task of tasks) {
       const token =
-        "dzEKp1rbB0LVTbZF903x8P:APA91bFuw47U4ZEw-v8LTVOuY6V0IqVn5yUEI8_1jhHlyHKBfJCb38ZX2zI7-p1t_JodutcwyNRwltU_egZiou_1QV0piRkEgwFqkc327D4Wv2WOkYxutao";
+        "dzgpu-QJW0YkE45j6ac3DB:APA91bHJ83tkcMBgHbya0TFTICLMjqs_lrHFT9uTfnGydHX6f5B2P7OqVK1d8jaKZ9mz0pm4ftIBDbfD3ZACEdqjNz5HO3YnSRmfqI5URKOiM4fMauq4ixU";
 
       const response = await admin.messaging().send({
         token,
@@ -72,7 +72,7 @@ app.get("/", (req, res) => {
 app.get("/test-notification", async (req, res) => {
   try {
     const token =
-      "dzEKp1rbB0LVTbZF903x8P:APA91bFuw47U4ZEw-v8LTVOuY6V0IqVn5yUEI8_1jhHlyHKBfJCb38ZX2zI7-p1t_JodutcwyNRwltU_egZiou_1QV0piRkEgwFqkc327D4Wv2WOkYxutao";
+      "dzgpu-QJW0YkE45j6ac3DB:APA91bHJ83tkcMBgHbya0TFTICLMjqs_lrHFT9uTfnGydHX6f5B2P7OqVK1d8jaKZ9mz0pm4ftIBDbfD3ZACEdqjNz5HO3YnSRmfqI5URKOiM4fMauq4ixU";
 
     const response = await admin.messaging().send({
       token,
