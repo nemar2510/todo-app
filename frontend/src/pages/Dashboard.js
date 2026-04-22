@@ -26,7 +26,7 @@ function Dashboard() {
   const [editId, setEditId] = useState(null);
   const [filtered, setFiltered] = useState([]);
 
-  // 🔥 UPDATED NOTIFICATION LOGIC (FIXED)
+  // 🔥 UPDATED NOTIFICATION LOGIC (FINAL)
   useEffect(() => {
     const setupNotifications = async () => {
       try {
@@ -34,14 +34,24 @@ function Dashboard() {
         console.log("Permission:", permission);
 
         if (permission === "granted") {
+
+          // ✅ REGISTER SERVICE WORKER
+          const registration = await navigator.serviceWorker.register(
+            "/firebase-messaging-sw.js"
+          );
+
+          console.log("Service Worker registered:", registration);
+
+          // ✅ GET TOKEN WITH SERVICE WORKER
           const currentToken = await getToken(messaging, {
-            vapidKey: "BEZNMqPCUCFd9OE6AqxnIf7w_L4zUPJmrciaSnn7JwHtPbdCIBEjeQ6cmWVykYn52pUNj1m2Cr61_b-oay0eT7s"
+            vapidKey: "BEZNMqPCUCFd9OE6AqxnIf7w_L4zUPJmrciaSnn7JwHtPbdCIBEjeQ6cmWVykYn52pUNj1m2Cr61_b-oay0eT7s",
+            serviceWorkerRegistration: registration
           });
 
           if (currentToken) {
             console.log("🔥 DEVICE TOKEN:", currentToken);
 
-            // store token locally (optional)
+            // store token locally
             localStorage.setItem("deviceToken", currentToken);
 
           } else {
@@ -55,14 +65,14 @@ function Dashboard() {
 
     setupNotifications();
 
-    // 🔔 When app is open
+    // 🔔 Foreground notification (when app open)
     onMessage(messaging, (payload) => {
       alert(payload.notification.title + " - " + payload.notification.body);
     });
 
   }, []);
 
-  // ✅ EXISTING AUTH CHECK
+  // ✅ EXISTING AUTH CHECK (UNCHANGED)
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -209,6 +219,8 @@ function Dashboard() {
           ⏰ Stay on time | 📅 Organize tasks | ⚡ Boost productivity
         </p>
 
+        {/* EVERYTHING BELOW UNCHANGED */}
+
         <div style={{ position: "relative", marginTop: "15px" }}>
           <input
             value={title}
@@ -305,13 +317,6 @@ function Dashboard() {
               <button onClick={() => startEdit(task)}><FaEdit /></button>
               <button onClick={() => toggleComplete(task)}><FaCheck /></button>
               <button onClick={() => deleteTask(task._id)}><FaTrash /></button>
-              <button onClick={() => {
-                Notification.requestPermission().then((permission) => {
-                  console.log("Permission:", permission);
-                });
-              }}>
-                Enable Notifications
-              </button>
             </div>
           </div>
         ))}
