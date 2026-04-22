@@ -33,15 +33,24 @@ cron.schedule("* * * * *", async () => {
   try {
     const Task = require("./models/Task");
 
-    const now = new Date();
-    const currentTime =
-      now.getHours().toString().padStart(2, "0") +
-      ":" +
-      now.getMinutes().toString().padStart(2, "0");
+    const now = new Date().toLocaleString("en-US", {
+  timeZone: "Asia/Kolkata"
+});
+
+const date = new Date(now);
+
+const currentTime =
+  date.getHours().toString().padStart(2, "0") +
+  ":" +
+  date.getMinutes().toString().padStart(2, "0");
+
+console.log("⏰ IST TIME:", currentTime);
 
     const tasks = await Task.find({ time: currentTime });
 
     for (let task of tasks) {
+      console.log("📌 Task time:", task.time);
+console.log("🟢 Current time:", currentTime);
       const token =
         "dzgpu-QJW0YkE45j6ac3DB:APA91bHJ83tkcMBgHbya0TFTICLMjqs_lrHFT9uTfnGydHX6f5B2P7OqVK1d8jaKZ9mz0pm4ftIBDbfD3ZACEdqjNz5HO3YnSRmfqI5URKOiM4fMauq4ixU";
 
