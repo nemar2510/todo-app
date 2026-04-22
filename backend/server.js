@@ -24,9 +24,11 @@ mongoose
     process.exit(1);
   });
 
-  // 🔥 AUTO REMINDER CHECK
+/* =========================
+   🔥 AUTO REMINDER CHECK
+========================= */
 cron.schedule("* * * * *", async () => {
-  console.log("Checking tasks...");
+  console.log("⏰ Checking tasks...");
 
   try {
     const Task = require("./models/Task");
@@ -37,60 +39,68 @@ cron.schedule("* * * * *", async () => {
       ":" +
       now.getMinutes().toString().padStart(2, "0");
 
-    // 🔍 Find tasks matching current time
     const tasks = await Task.find({ time: currentTime });
 
     for (let task of tasks) {
-      // 👉 you will later store user device token in DB
-      const token = "dzEKp1rbB0LVTbZF903x8P:APA91bFuw47U4ZEw-v8LTVOuY6V0IqVn5yUEI8_1jhHlyHKBfJCb38ZX2zI7-p1t_JodutcwyNRwltU_egZiou_1QV0piRkEgwFqkc327D4Wv2WOkYxutao";
+      const token =
+        "dzEKp1rbB0LVTbZF903x8P:APA91bFuw47U4ZEw-v8LTVOuY6V0IqVn5yUEI8_1jhHlyHKBfJCb38ZX2zI7-p1t_JodutcwyNRwltU_egZiou_1QV0piRkEgwFqkc327D4Wv2WOkYxutao";
 
-      await admin.messaging().send({
+      const response = await admin.messaging().send({
         token,
         notification: {
           title: "⏰ Task Reminder",
-          body: task.title
-        }
+          body: task.title,
+        },
       });
 
-      console.log("Notification sent for:", task.title);
+      console.log("✅ Notification sent:", response);
     }
-
   } catch (err) {
-    console.log("Cron error:", err.message);
+    console.log("❌ Cron FULL ERROR:", err); // 🔥 full error
   }
 });
 
-// test route
+/* =========================
+   TEST ROUTES
+========================= */
+
 app.get("/", (req, res) => {
   res.send("Server is working");
 });
 
-// 🔥 Notification test route
+// 🔥 Notification test route (UPDATED)
 app.get("/test-notification", async (req, res) => {
   try {
-    const token = "dzEKp1rbB0LVTbZF903x8P:APA91bFuw47U4ZEw-v8LTVOuY6V0IqVn5yUEI8_1jhHlyHKBfJCb38ZX2zI7-p1t_JodutcwyNRwltU_egZiou_1QV0piRkEgwFqkc327D4Wv2WOkYxutao";
+    const token =
+      "dzEKp1rbB0LVTbZF903x8P:APA91bFuw47U4ZEw-v8LTVOuY6V0IqVn5yUEI8_1jhHlyHKBfJCb38ZX2zI7-p1t_JodutcwyNRwltU_egZiou_1QV0piRkEgwFqkc327D4Wv2WOkYxutao";
 
-    await admin.messaging().send({
+    const response = await admin.messaging().send({
       token,
       notification: {
         title: "🔥 Notification Working!",
-        body: "Your app can now send reminders 🎉"
-      }
+        body: "Your app can now send reminders 🎉",
+      },
     });
 
+    console.log("✅ SUCCESS:", response);
     res.send("Notification sent");
-
   } catch (err) {
-    console.log("Notification error:", err.message);
-    res.send("Error sending notification");
+    console.log("❌ FULL ERROR:", err); // 🔥 IMPORTANT
+    res.send(err.message); // 🔥 shows real error in browser
   }
 });
 
-// routes (UNCHANGED)
+/* =========================
+   ROUTES
+========================= */
+
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/tasks", require("./routes/taskRoutes"));
 
-// start server
+/* =========================
+   SERVER
+========================= */
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
