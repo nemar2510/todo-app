@@ -53,7 +53,7 @@ cron.schedule("* * * * *", async () => {
       console.log("🟢 Current time:", currentTime);
 
       const token =
-        "dErcvjUS80_LfDMs0CER-a:APA91bEDBbisOJLCCCkW_cY_YwpS0TGCP_wWfNIjOgQwQPbHfvZnmpizfB65FWhegxgETYHwPv41ZpxWxzViJuPYObdqOeQIDd9JIuxWS3iLepA6OinfGGs";
+        "cdW_CiJ35I_8fgqk7xG-Al:APA91bGQyn2aMdJSGBRb_H9qJmYsS_uhXq40KOfk6dIvqbQSe0a3-ql6gEdoZHRs-kFR9-LN5f_HwZ9qsVoGVbZIH5yOLKA_8_Y4ZLo1T-DOpdD4a8oFEeg";
 
       const response = await admin.messaging().send({
         token,
@@ -106,7 +106,7 @@ app.get("/", (req, res) => {
 app.get("/test-notification", async (req, res) => {
   try {
     const token =
-      "dErcvjUS80_LfDMs0CER-a:APA91bEDBbisOJLCCCkW_cY_YwpS0TGCP_wWfNIjOgQwQPbHfvZnmpizfB65FWhegxgETYHwPv41ZpxWxzViJuPYObdqOeQIDd9JIuxWS3iLepA6OinfGGs";
+      "cdW_CiJ35I_8fgqk7xG-Al:APA91bGQyn2aMdJSGBRb_H9qJmYsS_uhXq40KOfk6dIvqbQSe0a3-ql6gEdoZHRs-kFR9-LN5f_HwZ9qsVoGVbZIH5yOLKA_8_Y4ZLo1T-DOpdD4a8oFEeg";
 
     const response = await admin.messaging().send({
       token,
