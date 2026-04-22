@@ -3,7 +3,7 @@ import API from "../api/api";
 import { FaTrash, FaCheck, FaEdit } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
-// 🔥 ADD THESE IMPORTS
+// 🔥 Firebase
 import { messaging } from "../firebase";
 import { getToken, onMessage } from "firebase/messaging";
 
@@ -15,8 +15,9 @@ const suggestions = [
   "Shopping", "Study", "Sleep", "Workout"
 ];
 
-function Dashboard() { 
+function Dashboard() {
   console.log("Dashboard loaded");
+
   const navigate = useNavigate();
 
   const [tasks, setTasks] = useState([]);
@@ -25,23 +26,34 @@ function Dashboard() {
   const [editId, setEditId] = useState(null);
   const [filtered, setFiltered] = useState([]);
 
-  // 🔥 ADD THIS NEW useEffect (notifications)
+  // 🔥 UPDATED NOTIFICATION LOGIC (FIXED)
   useEffect(() => {
-    Notification.requestPermission().then((permission) => {
-      if (permission === "granted") {
+    const setupNotifications = async () => {
+      try {
+        const permission = await Notification.requestPermission();
+        console.log("Permission:", permission);
 
-        getToken(messaging, {
-          vapidKey: "BEZNMqPCUCFd9OE6AqxnIf7w_L4zUPJmrciaSnn7JwHtPbdCIBEjeQ6cmWVykYn52pUNj1m2Cr61_b-oay0eT7s"
-        }).then((currentToken) => {
+        if (permission === "granted") {
+          const currentToken = await getToken(messaging, {
+            vapidKey: "BEZNMqPCUCFd9OE6AqxnIf7w_L4zUPJmrciaSnn7JwHtPbdCIBEjeQ6cmWVykYn52pUNj1m2Cr61_b-oay0eT7s"
+          });
+
           if (currentToken) {
-            console.log("DEVICE TOKEN:", currentToken);
-          } else {
-            console.log("No token received");
-          }
-        });
+            console.log("🔥 DEVICE TOKEN:", currentToken);
 
+            // store token locally (optional)
+            localStorage.setItem("deviceToken", currentToken);
+
+          } else {
+            console.log("❌ No registration token available");
+          }
+        }
+      } catch (err) {
+        console.log("❌ Token error:", err);
       }
-    });
+    };
+
+    setupNotifications();
 
     // 🔔 When app is open
     onMessage(messaging, (payload) => {
@@ -50,7 +62,7 @@ function Dashboard() {
 
   }, []);
 
-  // ✅ EXISTING useEffect (UNCHANGED)
+  // ✅ EXISTING AUTH CHECK
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -294,12 +306,12 @@ function Dashboard() {
               <button onClick={() => toggleComplete(task)}><FaCheck /></button>
               <button onClick={() => deleteTask(task._id)}><FaTrash /></button>
               <button onClick={() => {
-  Notification.requestPermission().then((permission) => {
-    console.log("Permission:", permission);
-  });
-}}>
-  Enable Notifications
-</button>
+                Notification.requestPermission().then((permission) => {
+                  console.log("Permission:", permission);
+                });
+              }}>
+                Enable Notifications
+              </button>
             </div>
           </div>
         ))}
