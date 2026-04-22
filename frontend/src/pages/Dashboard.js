@@ -3,6 +3,10 @@ import API from "../api/api";
 import { FaTrash, FaCheck, FaEdit } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
+// 🔥 ADD THESE IMPORTS
+import { messaging } from "../firebase";
+import { getToken, onMessage } from "firebase/messaging";
+
 const suggestions = [
   "Alarm", "Bath", "Breakfast", "Call", "Coding",
   "Cleaning", "Dance", "Driving", "Exercise",
@@ -11,7 +15,8 @@ const suggestions = [
   "Shopping", "Study", "Sleep", "Workout"
 ];
 
-function Dashboard() {
+function Dashboard() { 
+  console.log("Dashboard loaded");
   const navigate = useNavigate();
 
   const [tasks, setTasks] = useState([]);
@@ -20,7 +25,32 @@ function Dashboard() {
   const [editId, setEditId] = useState(null);
   const [filtered, setFiltered] = useState([]);
 
-  // ✅ FIXED useEffect (no Vercel error)
+  // 🔥 ADD THIS NEW useEffect (notifications)
+  useEffect(() => {
+    Notification.requestPermission().then((permission) => {
+      if (permission === "granted") {
+
+        getToken(messaging, {
+          vapidKey: "BEZNMqPCUCFd9OE6AqxnIf7w_L4zUPJmrciaSnn7JwHtPbdCIBEjeQ6cmWVykYn52pUNj1m2Cr61_b-oay0eT7s"
+        }).then((currentToken) => {
+          if (currentToken) {
+            console.log("DEVICE TOKEN:", currentToken);
+          } else {
+            console.log("No token received");
+          }
+        });
+
+      }
+    });
+
+    // 🔔 When app is open
+    onMessage(messaging, (payload) => {
+      alert(payload.notification.title + " - " + payload.notification.body);
+    });
+
+  }, []);
+
+  // ✅ EXISTING useEffect (UNCHANGED)
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -142,7 +172,6 @@ function Dashboard() {
         boxShadow: "0 10px 30px rgba(0,0,0,0.3)"
       }}>
 
-        {/* HEADER */}
         <div style={{
           display: "flex",
           justifyContent: "space-between",
@@ -168,7 +197,6 @@ function Dashboard() {
           ⏰ Stay on time | 📅 Organize tasks | ⚡ Boost productivity
         </p>
 
-        {/* INPUT */}
         <div style={{ position: "relative", marginTop: "15px" }}>
           <input
             value={title}
@@ -182,7 +210,6 @@ function Dashboard() {
             }}
           />
 
-          {/* DROPDOWN */}
           {filtered.length > 0 && (
             <div style={{
               position: "absolute",
@@ -212,7 +239,6 @@ function Dashboard() {
           )}
         </div>
 
-        {/* TIME */}
         <input
           type="time"
           value={time}
@@ -243,7 +269,6 @@ function Dashboard() {
 
         <hr />
 
-        {/* TASK LIST */}
         {tasks.map(task => (
           <div key={task._id} style={{
             background: task.completed ? "#00c6ff" : "#ffffff20",
@@ -268,6 +293,13 @@ function Dashboard() {
               <button onClick={() => startEdit(task)}><FaEdit /></button>
               <button onClick={() => toggleComplete(task)}><FaCheck /></button>
               <button onClick={() => deleteTask(task._id)}><FaTrash /></button>
+              <button onClick={() => {
+  Notification.requestPermission().then((permission) => {
+    console.log("Permission:", permission);
+  });
+}}>
+  Enable Notifications
+</button>
             </div>
           </div>
         ))}
