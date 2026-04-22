@@ -26,7 +26,7 @@ function Dashboard() {
   const [editId, setEditId] = useState(null);
   const [filtered, setFiltered] = useState([]);
 
-  // 🔥 UPDATED NOTIFICATION LOGIC (FINAL)
+  // 🔥 UPDATED NOTIFICATION LOGIC (FINAL FIX)
   useEffect(() => {
     const setupNotifications = async () => {
       try {
@@ -35,14 +35,10 @@ function Dashboard() {
 
         if (permission === "granted") {
 
-          // ✅ REGISTER SERVICE WORKER
-          const registration = await navigator.serviceWorker.register(
-            "/firebase-messaging-sw.js"
-          );
+          // ✅ FIX: wait for already registered service worker
+          const registration = await navigator.serviceWorker.ready;
+          console.log("Service Worker ready:", registration);
 
-          console.log("Service Worker registered:", registration);
-
-          // ✅ GET TOKEN WITH SERVICE WORKER
           const currentToken = await getToken(messaging, {
             vapidKey: "BEZNMqPCUCFd9OE6AqxnIf7w_L4zUPJmrciaSnn7JwHtPbdCIBEjeQ6cmWVykYn52pUNj1m2Cr61_b-oay0eT7s",
             serviceWorkerRegistration: registration
@@ -51,7 +47,9 @@ function Dashboard() {
           if (currentToken) {
             console.log("🔥 DEVICE TOKEN:", currentToken);
 
-            // store token locally
+            // ✅ IMPORTANT (for mobile testing)
+            alert("DEVICE TOKEN:\n" + currentToken);
+
             localStorage.setItem("deviceToken", currentToken);
 
           } else {
@@ -65,7 +63,7 @@ function Dashboard() {
 
     setupNotifications();
 
-    // 🔔 Foreground notification (when app open)
+    // 🔔 Foreground notification
     onMessage(messaging, (payload) => {
       alert(payload.notification.title + " - " + payload.notification.body);
     });
@@ -219,8 +217,6 @@ function Dashboard() {
           ⏰ Stay on time | 📅 Organize tasks | ⚡ Boost productivity
         </p>
 
-        {/* EVERYTHING BELOW UNCHANGED */}
-
         <div style={{ position: "relative", marginTop: "15px" }}>
           <input
             value={title}
@@ -313,29 +309,30 @@ function Dashboard() {
               <small>{task.time}</small>
             </div>
 
-           <div style={{ display: "flex", gap: "5px", flexWrap: "wrap" }}>
-  <button onClick={() => startEdit(task)}><FaEdit /></button>
-  <button onClick={() => toggleComplete(task)}><FaCheck /></button>
-  <button onClick={() => deleteTask(task._id)}><FaTrash /></button>
+            <div style={{ display: "flex", gap: "5px", flexWrap: "wrap" }}>
+              <button onClick={() => startEdit(task)}><FaEdit /></button>
+              <button onClick={() => toggleComplete(task)}><FaCheck /></button>
+              <button onClick={() => deleteTask(task._id)}><FaTrash /></button>
 
-  <button
-    onClick={() => {
-      Notification.requestPermission().then((permission) => {
-        console.log("Permission:", permission);
-      });
-    }}
-    style={{
-      fontSize: "10px",
-      padding: "4px",
-      background: "#00c6ff",
-      border: "none",
-      borderRadius: "4px",
-      color: "white"
-    }}
-  >
-    Enable Notifications
-  </button>
-</div>
+              <button
+                onClick={() => {
+                  Notification.requestPermission().then((permission) => {
+                    console.log("Permission:", permission);
+                  });
+                }}
+                style={{
+                  fontSize: "10px",
+                  padding: "4px",
+                  background: "#00c6ff",
+                  border: "none",
+                  borderRadius: "4px",
+                  color: "white"
+                }}
+              >
+                Enable Notifications
+              </button>
+            </div>
+
           </div>
         ))}
 
