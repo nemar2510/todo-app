@@ -52,7 +52,7 @@ console.log("⏰ IST TIME:", currentTime);
       console.log("📌 Task time:", task.time);
 console.log("🟢 Current time:", currentTime);
       const token =
-        "dzgpu-QJW0YkE45j6ac3DB:APA91bHJ83tkcMBgHbya0TFTICLMjqs_lrHFT9uTfnGydHX6f5B2P7OqVK1d8jaKZ9mz0pm4ftIBDbfD3ZACEdqjNz5HO3YnSRmfqI5URKOiM4fMauq4ixU";
+        "dErcvjUS80_LfDMs0CER-a:APA91bEDBbisOJLCCCkW_cY_YwpS0TGCP_wWfNIjOgQwQPbHfvZnmpizfB65FWhegxgETYHwPv41ZpxWxzViJuPYObdqOeQIDd9JIuxWS3iLepA6OinfGGs";
 
       const response = await admin.messaging().send({
         token,
@@ -81,7 +81,7 @@ app.get("/", (req, res) => {
 app.get("/test-notification", async (req, res) => {
   try {
     const token =
-      "dzgpu-QJW0YkE45j6ac3DB:APA91bHJ83tkcMBgHbya0TFTICLMjqs_lrHFT9uTfnGydHX6f5B2P7OqVK1d8jaKZ9mz0pm4ftIBDbfD3ZACEdqjNz5HO3YnSRmfqI5URKOiM4fMauq4ixU";
+      "dErcvjUS80_LfDMs0CER-a:APA91bEDBbisOJLCCCkW_cY_YwpS0TGCP_wWfNIjOgQwQPbHfvZnmpizfB65FWhegxgETYHwPv41ZpxWxzViJuPYObdqOeQIDd9JIuxWS3iLepA6OinfGGs";
 
     const response = await admin.messaging().send({
       token,
