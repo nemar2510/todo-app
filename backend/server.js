@@ -15,7 +15,25 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// MongoDB connection
+/* =========================
+   🔥 TOKEN STORAGE
+========================= */
+let tokens = []; // temporary storage
+
+app.post("/save-token", (req, res) => {
+  const { token } = req.body;
+
+  if (!tokens.includes(token)) {
+    tokens.push(token);
+    console.log("📱 Token saved:", token);
+  }
+
+  res.send("Token stored");
+});
+
+/* =========================
+   DATABASE
+========================= */
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Connected"))
@@ -52,18 +70,22 @@ cron.schedule("* * * * *", async () => {
       console.log("📌 Task time:", task.time);
       console.log("🟢 Current time:", currentTime);
 
-      const token =
-        "cdW_CiJ35I_8fgqk7xG-Al:APA91bGQyn2aMdJSGBRb_H9qJmYsS_uhXq40KOfk6dIvqbQSe0a3-ql6gEdoZHRs-kFR9-LN5f_HwZ9qsVoGVbZIH5yOLKA_8_Y4ZLo1T-DOpdD4a8oFEeg";
+      // 🔥 SEND TO ALL DEVICES
+      for (let t of tokens) {
+        try {
+          const response = await admin.messaging().send({
+            token: t,
+            notification: {
+              title: "⏰ Task Reminder",
+              body: task.title,
+            },
+          });
 
-      const response = await admin.messaging().send({
-        token,
-        notification: {
-          title: "⏰ Task Reminder",
-          body: task.title,
-        },
-      });
-
-      console.log("✅ Notification sent:", response);
+          console.log("✅ Notification sent to:", t);
+        } catch (err) {
+          console.log("❌ Error sending to token:", t, err.message);
+        }
+      }
     }
   } catch (err) {
     console.log("❌ Cron FULL ERROR:", err);
@@ -71,7 +93,7 @@ cron.schedule("* * * * *", async () => {
 });
 
 /* =========================
-   🔥 NEW STEP 2 API (ADDED)
+   🔥 SEND NOTIFICATION API
 ========================= */
 app.post("/send-notification", async (req, res) => {
   const { token, title, body } = req.body;
@@ -102,22 +124,22 @@ app.get("/", (req, res) => {
   res.send("Server is working");
 });
 
-// 🔥 Notification test route (UNCHANGED)
+// 🔥 TEST NOTIFICATION → SEND TO ALL DEVICES
 app.get("/test-notification", async (req, res) => {
   try {
-    const token =
-      "cdW_CiJ35I_8fgqk7xG-Al:APA91bGQyn2aMdJSGBRb_H9qJmYsS_uhXq40KOfk6dIvqbQSe0a3-ql6gEdoZHRs-kFR9-LN5f_HwZ9qsVoGVbZIH5yOLKA_8_Y4ZLo1T-DOpdD4a8oFEeg";
+    for (let t of tokens) {
+      await admin.messaging().send({
+        token: t,
+        notification: {
+          title: "🔥 Notification Working!",
+          body: "Your app can now send reminders 🎉",
+        },
+      });
+    }
 
-    const response = await admin.messaging().send({
-      token,
-      notification: {
-        title: "🔥 Notification Working!",
-        body: "Your app can now send reminders 🎉",
-      },
-    });
+    console.log("✅ SUCCESS: Notifications sent to all devices");
+    res.send("Notification sent to all devices");
 
-    console.log("✅ SUCCESS:", response);
-    res.send("Notification sent");
   } catch (err) {
     console.log("❌ FULL ERROR:", err);
     res.send(err.message);
