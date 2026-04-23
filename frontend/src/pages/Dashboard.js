@@ -26,7 +26,7 @@ function Dashboard() {
   const [editId, setEditId] = useState(null);
   const [filtered, setFiltered] = useState([]);
 
-  // 🔥 UPDATED NOTIFICATION LOGIC (FINAL FIX)
+  // 🔥 NOTIFICATION LOGIC (FIXED)
   useEffect(() => {
     const setupNotifications = async () => {
       try {
@@ -35,7 +35,7 @@ function Dashboard() {
 
         if (permission === "granted") {
 
-          // ✅ FIX: wait for already registered service worker
+          // wait for service worker
           const registration = await navigator.serviceWorker.ready;
           console.log("Service Worker ready:", registration);
 
@@ -47,17 +47,20 @@ function Dashboard() {
           if (currentToken) {
             console.log("🔥 DEVICE TOKEN:", currentToken);
 
-            // ✅ IMPORTANT (for mobile testing)
             alert("DEVICE TOKEN:\n" + currentToken);
 
             localStorage.setItem("deviceToken", currentToken);
-            await fetch("https://YOUR-BACKEND-URL/save-token", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({ token: currentToken })
-});
+
+            // ✅ SEND TOKEN TO BACKEND
+            await fetch("https://todo-app-wyji.onrender.com/save-token", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({ token: currentToken })
+            });
+
+            console.log("✅ Token sent to backend");
 
           } else {
             console.log("❌ No registration token available");
@@ -77,7 +80,7 @@ function Dashboard() {
 
   }, []);
 
-  // ✅ EXISTING AUTH CHECK (UNCHANGED)
+  // ✅ AUTH CHECK
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -348,4 +351,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;s
+export default Dashboard;
