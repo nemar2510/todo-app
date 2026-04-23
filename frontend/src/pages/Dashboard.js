@@ -51,6 +51,13 @@ function Dashboard() {
             alert("DEVICE TOKEN:\n" + currentToken);
 
             localStorage.setItem("deviceToken", currentToken);
+            await fetch("https://YOUR-BACKEND-URL/save-token", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({ token: currentToken })
+});
 
           } else {
             console.log("❌ No registration token available");
@@ -341,4 +348,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;
+export default Dashboard;s
